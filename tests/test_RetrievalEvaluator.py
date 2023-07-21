@@ -1,6 +1,6 @@
 import pytest
 
-from mteb.evaluation.evaluators import RetrievalEvaluator
+from mteb_.evaluation.evaluators import RetrievalEvaluator
 
 TOL = 0.0001
 

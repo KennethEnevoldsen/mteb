@@ -1,5 +1,5 @@
 import os
-from mteb import MTEB
+from mteb_ import MTEB
 
 HEADER = "| Name | Hub URL | Description | Type | Category | #Languages | Train #Samples | Dev #Samples | Test #Samples | Avg. chars / train | Avg. chars / dev | Avg. chars / test"
 SEP = "|:-----|:-----|:-----|:-----|:-----|-----:|-----:|-----:|-----:|-----:|-----:|-----:|"

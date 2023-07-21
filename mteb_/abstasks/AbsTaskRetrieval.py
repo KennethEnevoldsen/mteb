@@ -61,21 +61,19 @@ class AbsTaskRetrieval(AbsTask):
         corpus, queries, relevant_docs = self.corpus[split], self.queries[split], self.relevant_docs[split]
 
         if True:
-            from beir.retrieval.search.dense import DenseRetrievalParallelExactSearch as DRPES
+            # from beir.retrieval.search.dense import DenseRetrievalParallelExactSearch as DRPES
+            from beir.retrieval.search.dense import DenseRetrievalExactSearch as DRPES
 
             if self.description["beir_name"].startswith("cqadupstack"):
                 raise ImportError("CQADupstack is incompatible with latest BEIR")
-            from beir.retrieval.search.dense import (
-                DenseRetrievalParallelExactSearch as DRPES,
-            )
 
             model = model if self.is_dres_compatible(model, is_parallel=True) else DRESModel(model)
 
             model = DRPES(
                 model,
                 batch_size=batch_size,
-                target_devices=target_devices,
-                corpus_chunk_size=corpus_chunk_size,
+                target_devices=[target_devices] if target_devices is not None else ["cpu"],
+                corpus_chunk_size=corpus_chunk_size if corpus_chunk_size is not None else 50000,
                 **kwargs,
             )
         else:
@@ -112,8 +110,14 @@ class AbsTaskRetrieval(AbsTask):
             **{f"precision_at_{k.split('@')[1]}": v for (k, v) in precision.items()},
             **{f"mrr_at_{k.split('@')[1]}": v for (k, v) in mrr.items()},
         }
-
+        self._add_main_score(scores)
         return scores
+
+    def _add_main_score(self, scores):
+        if self.description["main_score"] in scores:
+            scores["main_score"] = scores[self.description["main_score"]]
+        else:
+            print(f"WARNING: main score {self.description['main_score']} not found in scores {scores.keys()}")
 
 
 class DRESModel:

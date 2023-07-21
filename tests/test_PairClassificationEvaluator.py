@@ -1,6 +1,6 @@
 import pytest
 
-from mteb.evaluation.evaluators import PairClassificationEvaluator
+from mteb_.evaluation.evaluators import PairClassificationEvaluator
 
 TOL = 0.0001
 

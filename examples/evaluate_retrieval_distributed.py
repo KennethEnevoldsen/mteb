@@ -1,7 +1,7 @@
 import logging
 import time
 
-from mteb import MTEB
+from mteb_ import MTEB
 from sentence_transformers import SentenceTransformer
 
 

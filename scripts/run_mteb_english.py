@@ -4,7 +4,7 @@ import argparse
 import logging
 import os
 
-from mteb import MTEB
+from mteb_ import MTEB
 from sentence_transformers import SentenceTransformer
 
 logging.basicConfig(level=logging.INFO)

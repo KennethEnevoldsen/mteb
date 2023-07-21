@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 import os
 import random
 from abc import ABC, abstractmethod
@@ -29,14 +28,10 @@ class AbsTask(ABC):
         if self.data_loaded:
             return
 
-        path = "/gpfsscratch/rech/six/commun/commun/experiments/muennighoff/" + self.description["hf_hub_name"]
-        is_offline = int(os.environ["HF_DATASETS_OFFLINE"])
-        if is_offline or os.path.exists(path):
-            self.dataset = datasets.load_dataset(path, revision=self.description.get("revision", None))  # TODO: add split argument
-        else:
-            from git import Repo
-            Repo.clone_from("https://huggingface.co/datasets/" + self.description["hf_hub_name"], path)
-            self.dataset = datasets.load_dataset(path, revision=self.description.get("revision", None))
+        # TODO: add split argument
+        self.dataset = datasets.load_dataset(
+            self.description["hf_hub_name"], revision=self.description.get("revision", None)
+        )
         self.data_loaded = True
 
     @property

@@ -28,7 +28,7 @@ import logging
 import os
 import sys
 
-from mteb import MTEB
+from mteb_ import MTEB
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

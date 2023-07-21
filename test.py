@@ -2,6 +2,10 @@
 !pip install "mteb[beir]"
 !pip install git+https://github.com/UKPLab/sentence-transformers.git  --upgrade
 !pip install --force --no-deps git+https://github.com/UKPLab/sentence-transformers.git
+!pip install evaluate
+
+cd /Users/au561649/Github/mteb ; /usr/bin/env /Users/au561649/.virtualenvs/mteb_test/bin/python /Users/au561649/.vscode/extensions/ms-python.python-2023.12.0/pythonFiles/lib/python/debugpy/adapter/../../debugpy/launcher 62557 -- /Users/au561649/Github/mteb/test.py 
+cd /Users/au561649/Github/mteb ; /usr/bin/env /Users/au561649/.virtualenvs/mteb_test/bin/python /Users/au561649/.vscode/extensions/ms-python.python-2023.12.0/pythonFiles/lib/python/debugpy/adapter/../../debugpy/launcher 62570 -- /Users/au561649/Github/mteb/test.py 
 """
 
 import json
@@ -11,7 +15,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 
 from mteb import MTEB
-from tasks import (
+from tasks import (  # SweFAQRetrieval,
     AngryTweetsClassification,
     BornholmBitextMining,
     DalajClassification,
@@ -24,7 +28,6 @@ from tasks import (
     ScalaDaClassification,
     ScalaNbClassification,
     ScalaSvClassification,
-    SweFAQRetrieval,
     SweRecClassificition,
 )
 
@@ -51,64 +54,33 @@ from tasks import (
 # from sentence-transformers we select a series a series of baseline models
 
 # Limitations:
-# Currently no of the languages have tasks available for
-# Bitext (with the exception of Danish)
-# Reranking
-# Retrieval
-# Clustering
-# STS (With the exception of Swedish)
-# Summarization (Danish has DaNewsroom but it is not publicly available).
+    # Currently no of the languages have tasks available for
+    # Bitext (with the exception of the Bornholm Danish Parallel corpus)
+    # Reranking
+    # Retrieval (with the exception of Swedish, SweFAQ)
+    # Clustering
+    # STS (With the exception of Swedish)
+    # Summarization (Danish has DaNewsroom but it is not publicly available).
 
 #
 
 
 model_names = [
     "sentence-transformers/all-MiniLM-L6-v2",
-    # "KBLab/sentence-bert-swedish-cased",
-    # "jzju/sbert-sv-lim2",
-    # "chcaa/dfm-encoder-large-v1",
-    # "vesteinn/DanskBERT",
-    # "KennethEnevoldsen/dfm-sentence-encoder-medium",
-    # "KennethEnevoldsen/dfm-sentence-encoder-medium-2",
-    # "KennethEnevoldsen/dfm-sentence-encoder-medium-3",
-    # "intfloat/e5-base",
-    # "intfloat/multilingual-e5-small",
-    # "intfloat/multilingual-e5-base",
-    # "intfloat/multilingual-e5-large",
-    # "KennethEnevoldsen/dfm-sentence-encoder-large-1",
-    # "KennethEnevoldsen/dfm-sentence-encoder-large-2",
+    "KBLab/sentence-bert-swedish-cased",
+    "jzju/sbert-sv-lim2",
+    "chcaa/dfm-encoder-large-v1",
+    "vesteinn/DanskBERT",
+    "KennethEnevoldsen/dfm-sentence-encoder-medium",
+    "KennethEnevoldsen/dfm-sentence-encoder-medium-2",
+    "KennethEnevoldsen/dfm-sentence-encoder-medium-3",
+    "intfloat/e5-base",
+    "intfloat/multilingual-e5-small",
+    "intfloat/multilingual-e5-base",
+    "intfloat/multilingual-e5-large",
+    "KennethEnevoldsen/dfm-sentence-encoder-large-1",
+    "KennethEnevoldsen/dfm-sentence-encoder-large-2",
 ]
-
-
-outputs = []
-for model_name in model_names:
-    output_folder = f"results/{model_name}"
-    outputs.append(output_folder)
-    model = SentenceTransformer(model_name)
-
-    evaluation = MTEB(task_langs=["da"])
-    evaluation.run(model, output_folder=output_folder)
-    # custom tasks
-    evaluation = MTEB(
-        task_langs=["da"],
-        tasks=[
-            AngryTweetsClassification(),
-            DKHateClassification(),
-            BornholmBitextMining(),
-            DanishPoliticalCommentsClassification(),
-            LccClassification(),
-            MainlandScandinavianLangClassification(),
-            NoRecClassification(),
-            NorwegianParliamentClassification(),
-            ScalaDaClassification(),
-            ScalaNbClassification(),
-            ScalaSvClassification(),
-            SweFAQRetrieval(),
-            SweRecClassificition(),
-            DalajClassification(),
-        ],
-    )
-    evaluation.run(model, output_folder=output_folder)
 
 
 def load_scores_from_path(path):
@@ -139,13 +111,44 @@ def extract_main_perf_metric(output):
     return scores
 
 
-scores = [load_scores_from_path(output) for output in outputs]
-scores = [extract_main_perf_metric(output) for output in scores]
+if __name__ == "__main__":
+    outputs = []
+    for model_name in model_names:
+        output_folder = f"results/{model_name}"
+        outputs.append(output_folder)
+        model = SentenceTransformer(model_name)
 
-for mdl_nam, score in zip(model_names, scores):
-    print(mdl_nam)
-    main_scores = [s["main_score"] for s in score]
-    print(f"{np.mean(main_scores):.3f}±{np.std(main_scores):.3f}")
+        evaluation = MTEB(task_langs=["da", "sv", "nb", "no", "nn"])
+        evaluation.run(model, output_folder=output_folder)
+        # custom tasks
+        # evaluation = MTEB(
+        #     # task_langs=["da", "sv", "nb", "no", "nn"],
+        #     tasks=[
+        #         # AngryTweetsClassification(),
+        #         # DKHateClassification(),
+        #         # BornholmBitextMining(),
+        #         # DanishPoliticalCommentsClassification(),
+        #         # LccClassification(),
+        #         # MainlandScandinavianLangClassification(),
+        #         # NoRecClassification(),
+        #         # NorwegianParliamentClassification(),
+        #         # ScalaDaClassification(),
+        #         # ScalaNbClassification(),
+        #         # ScalaSvClassification(),
+        #         SweFAQRetrieval(),
+        #         # SweRecClassificition(),
+        #         # DalajClassification(),
+        #     ],
+        # )
+        # evaluation.run(model, output_folder=output_folder)
 
-    for s in score:
-        print(s)
+    scores = [load_scores_from_path(output) for output in outputs]
+    scores = [extract_main_perf_metric(output) for output in scores]
+
+    for mdl_nam, score in zip(model_names, scores):
+        print(mdl_nam)
+        main_scores = [s["main_score"] for s in score]
+        print(f"{np.mean(main_scores):.3f}±{np.std(main_scores):.3f}")
+
+        for s in score:
+            print(s)

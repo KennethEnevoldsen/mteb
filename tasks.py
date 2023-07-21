@@ -10,7 +10,7 @@ class BornholmBitextMining(AbsTaskBitextMining):
     @property
     def description(self):
         return {
-            "name": "Bornholm Parallel Corpus",
+            "name": "BornholmBitextMining",
             "hf_hub_name": "strombergnlp/bornholmsk_parallel",
             "description": "Bornholm Parallel Corpus",
             "reference": "https://aclanthology.org/W19-6138/",
@@ -462,53 +462,66 @@ class DalajClassification(AbsTaskClassification):
         return dataset
 
 
-class SweFAQRetrieval(AbsTaskRetrieval):
-    """
-    AbsTaskRetrieval: Abstract class for re-ranking experiments.
-    Child-classes must implement the following properties:
-    self.corpus = Dict[id, Dict[str, str]] #id => dict with document datas like title and text
-    self.queries = Dict[id, str] #id => query
-    self.relevant_docs = List[id, id, score]
-    """
+# class SweFAQRetrieval(AbsTaskRetrieval):
+#     """ """
 
-    @property
-    def description(self):
-        return {
-            "name": "SweFAQ",
-            "hf_hub_name": "AI-Sweden/SuperLim",
-            "description": "A Swedish FAQ dataset. Available as a part of Superlim",
-            "reference": "https://spraakbanken.gu.se/en/resources/superlim",
-            "type": "Retrieval",
-            "category": "s2p",
-            "eval_splits": ["test"],
-            "eval_langs": ["sv"],
-            "main_score": "ndcg_at_10",
-            "revision": "7ebf0b4caa7b2ae39698a889de782c09e6f5ee56",
-        }
+#     @property
+#     def description(self):
+#         return {
+#             "name": "SweFAQ",
+#             "hf_hub_name": "AI-Sweden/SuperLim",
+#             "description": "A Swedish FAQ dataset. Available as a part of Superlim",
+#             "reference": "https://spraakbanken.gu.se/en/resources/superlim",
+#             "type": "Retrieval",
+#             "category": "s2p",
+#             "eval_splits": ["test"],
+#             "eval_langs": ["sv"],
+#             "main_score": "ndcg_at_10",
+#             "revision": "7ebf0b4caa7b2ae39698a889de782c09e6f5ee56",
+#             "beir_name": "NA",
+#         }
 
-    def load_data(self, **kwargs):
-        """
-        Load dataset from HuggingFace hub
-        """
-        if self.data_loaded:
-            return
+#     def load_data(self, **kwargs):
+#         """
+#         Load dataset from HuggingFace hub and convert to MTEB format
+#         """
+#         if self.data_loaded:
+#             return
 
-        self.dataset = datasets.load_dataset(
-            self.description["hf_hub_name"], "swefaq", revision=self.description.get("revision")
-        )
-        self.data_loaded = True
+#         self.dataset = datasets.load_dataset(
+#             self.description["hf_hub_name"], "swefaq", revision=self.description.get("revision")
+#         )
+#         self.data_loaded = True
 
-        self.corpus, self.queries, self.relevant_docs = {}, {}, {}
-        for split in self.description["eval_splits"]:
-            dataset = self.dataset[split]  # type: ignore
-            answers = dataset["candidate_answer"]
-            self.corpus[split] = {idx: {"title": "", "text": answer} for idx, answer in enumerate(answers)}
+#         self.corpus, self.queries, self.relevant_docs = {}, {}, {}
+#         for split in self.description["eval_splits"]:
+#             dataset = self.dataset[split]  # type: ignore
+#             # answers = dataset["candidate_answer"]
+#             answers = dataset["correct_answer"]
+#             self.corpus[split] = {
+#                 str(idx): {"_id": str(idx), "title": "", "text": answer} for idx, answer in enumerate(answers)
+#             }
 
-            questions = dataset["question"]
-            self.queries[split] = {idx: question for idx, question in enumerate(questions)}
-            self.relevant_docs[split] = []  # Naïve approach, no relevant docs
+#             questions = dataset["question"]
+#             self.queries[split] = {str(idx): question for idx, question in enumerate(questions)}
+
+#             # Not sure what to do here:
+#             # first guess: Relevant documents is a mapping between each query and the desired responses (most relevant documents) for that query
+#             # result: Performance is 0.0 for all metrics
+#             self.relevant_docs[split] = {str(idx): {str(idx): 1} for idx in range(len(answers))}
+
+#             # second guess: Relevant documents is a mapping between each query and the relevant documents a pre-search would return
+#             # in which case. There is no pre-search, so we assume all documents are relevant.
+#             # result: Performance is perfect for all metrics
+
+#             # self.relevant_docs[split] = {}
+#             # # assume all are relevant
+#             # scores = {str(idx): 1 for idx in range(len(answers))}
+#             # for idx in range(len(answers)):
+#             #     self.relevant_docs[split][str(idx)] = scores
 
 
+# TODO: Add the remaining Swedish superlim tasks
 # from datasets import load_dataset
 
 # dataset = load_dataset("AI-Sweden/SuperLim", "swefaq", split="test")

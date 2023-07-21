@@ -14,7 +14,7 @@ import logging
 
 from sentence_transformers import SentenceTransformer
 
-from mteb import MTEB
+from mteb_ import MTEB
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)

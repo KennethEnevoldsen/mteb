@@ -2,7 +2,7 @@ from typing import List
 
 import numpy as np
 
-from mteb.evaluation.evaluators import ClusteringEvaluator
+from mteb_.evaluation.evaluators import ClusteringEvaluator
 
 
 class TestClusteringEvaluator:

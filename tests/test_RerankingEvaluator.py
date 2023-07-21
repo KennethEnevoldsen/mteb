@@ -1,6 +1,6 @@
 import pytest
 
-from mteb.evaluation.evaluators import RerankingEvaluator
+from mteb_.evaluation.evaluators import RerankingEvaluator
 
 TOL = 0.0001
 

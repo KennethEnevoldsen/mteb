@@ -150,6 +150,11 @@ class MTEB:
                     unknown_str, known_str = ",".join(sorted(list(tasks_unknown))), ",".join(sorted(list(tasks_known)))
                     logger.warning(f"WARNING: Unknown tasks: {unknown_str}. Known tasks: {known_str}.")
             # add task if subclass of mteb.tasks
+            filtered_tasks = filter(
+                lambda x: (self._task_langs is None)
+                or (len(set(x.description["eval_langs"]) & set(self._task_langs)) > 0),
+                self.tasks,
+            )
             self.tasks.extend([x for x in self._tasks if isinstance(x, AbsTask)])
             return
 
@@ -228,7 +233,7 @@ class MTEB:
 
             try:
                 task_eval_splits = eval_splits if eval_splits is not None else task.description.get("eval_splits", [])
-
+                task_eval_splits = ["validation"] if task.description['name'] == "MSMARCO" else ["test"]
                 # load data
                 logger.info(f"Loading dataset for {task.description['name']}")
                 task.load_data(eval_splits=task_eval_splits)

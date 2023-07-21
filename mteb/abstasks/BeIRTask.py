@@ -18,17 +18,10 @@ class BeIRTask(AbsTask):
         except ImportError:
             raise Exception("Retrieval tasks require beir package. Please install it with `pip install mteb[beir]`")
 
-        USE_BEIR_DEVELOPMENT = False
-        try:
-            raise ImportError("MTEB is temporarily incompatible with HFDataLoader")
-
-            if self.description["beir_name"].startswith("cqadupstack"):
-                raise ImportError("CQADupstack is incompatible with latest BEIR")
-            from beir.datasets.data_loader_hf import HFDataLoader as BeirDataLoader
-
-            USE_BEIR_DEVELOPMENT = True
-        except ImportError:
-            from beir.datasets.data_loader import GenericDataLoader as BeirDataLoader
+        #USE_BEIR_DEVELOPMENT = False
+        #from beir.datasets.data_loader_hf import HFDataLoader as BeirDataLoader
+        USE_BEIR_DEVELOPMENT = True
+        from beir.datasets.data_loader import GenericDataLoader as BeirDataLoader
 
         if self.data_loaded:
             return
@@ -41,12 +34,16 @@ class BeIRTask(AbsTask):
         for split in eval_splits:
             if USE_BEIR_DEVELOPMENT:
                 self.corpus[split], self.queries[split], self.relevant_docs[split] = BeirDataLoader(
-                    hf_repo=f"BeIR/{dataset}"
+                    hf_repo=f"/gpfsscratch/rech/six/commun/experiments/muennighoff/mteb/hfbeir/{dataset}"
                 ).load(split=split)
+                #hf_repo=f"BeIR/{dataset}"
+                
             else:
                 url = f"https://public.ukp.informatik.tu-darmstadt.de/thakur/BEIR/datasets/{dataset}.zip"
-                download_path = os.path.join(datasets.config.HF_DATASETS_CACHE, "BeIR")
-                data_path = util.download_and_unzip(url, download_path)
+                #download_path = os.path.join(datasets.config.HF_DATASETS_CACHE, "BeIR")
+                download_path = "/gpfsscratch/rech/six/commun/commun/experiments/muennighoff/mteb/"
+                #data_path = util.download_and_unzip(url, download_path)
+                data_path = download_path + dataset
                 data_path = f"{data_path}/{sub_dataset}" if sub_dataset else data_path
                 self.corpus[split], self.queries[split], self.relevant_docs[split] = BeirDataLoader(
                     data_folder=data_path

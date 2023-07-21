@@ -60,8 +60,8 @@ class AbsTaskRetrieval(AbsTask):
 
         corpus, queries, relevant_docs = self.corpus[split], self.queries[split], self.relevant_docs[split]
 
-        try:
-            raise ImportError("MTEB is temporarily incompatible with HFDataLoader")
+        if True:
+            from beir.retrieval.search.dense import DenseRetrievalParallelExactSearch as DRPES
 
             if self.description["beir_name"].startswith("cqadupstack"):
                 raise ImportError("CQADupstack is incompatible with latest BEIR")
@@ -78,7 +78,7 @@ class AbsTaskRetrieval(AbsTask):
                 corpus_chunk_size=corpus_chunk_size,
                 **kwargs,
             )
-        except ImportError:
+        else:
             if target_devices is not None:
                 logger.warning(
                     "DenseRetrievalParallelExactSearch could not be imported from beir. Using DenseRetrievalExactSearch instead."
